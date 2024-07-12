@@ -1,13 +1,13 @@
 
-import React from 'react';
-import Item from '../item/Item';
+import Item from "../item/Item";
+import style from "./ItemList.module.sass";
 
 const ItemList = () => {
   return (
-    <div>
-      <Item level={0}/>
+    <div className={style.list}>
+      <Item/>
     </div>
   );
-}
+};
 
 export default ItemList;
