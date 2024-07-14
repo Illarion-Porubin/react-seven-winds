@@ -1,17 +1,10 @@
 import React from "react";
 import style from "./TableList.module.sass";
-import { IDataNode } from "../../../../types";
-import { useCustomDispatch } from "../../../../hooks/store";
-import {
-  addChild,
-  deleteChild,
-  fetchCreateRowInEntity,
-  fetchDeleteRow,
-} from "../../../../redux/slices/contentSlice";
 import FileIcon from "../../../../assets/file.png";
 import TrashIcon from "../../../../assets/TrashFill.png";
 import TableInputs from "../tableInput/TableInputs";
-
+import { IDataNode, IUseNode } from "../../../../types";
+import { useNode } from "../../../../hooks/useNode";
 
 interface Props {
   node: IDataNode;
@@ -19,75 +12,63 @@ interface Props {
 }
 
 const TableList: React.FC<Props> = ({ node, id }) => {
-  const dispatch = useCustomDispatch();
   const [active, setActive] = React.useState<number | null>(null);
+  const {myNode}: IUseNode = useNode({node}); //вынес всю логику в отдельный хук
 
-  const handleAddChild = (parentId: number) => {
-    const newFile: IDataNode = {
-      id: Math.random(),
-      rowName: "string",
-      total: 0,
-      salary: 0,
-      mimExploitation: 0,
-      machineOperatorSalary: 0,
-      materials: 0,
-      mainCosts: 0,
-      supportCosts: 0,
-      equipmentCosts: 0,
-      overheads: 0,
-      estimatedProfit: 0,
-      child: [],
-    };
-    dispatch(fetchCreateRowInEntity({ parentId, newChild: newFile }));
-    dispatch(addChild({ parentId, newChild: newFile }));
+  const renderTree = (nodes: IDataNode[], id: number) => {
+    return nodes.map((node) => (
+      <TableList node={node} id={id + 1} key={node.id} />
+    ));
   };
 
-  const handleDeleteChild = (nodeId: number) => {
-    dispatch(fetchDeleteRow(nodeId));
-    dispatch(deleteChild(nodeId));
-  };
-
-  const renderTree = (nodes: IDataNode[], id:number) => {
-    return nodes.map((node) => <TableList node={node} id={id + 1} key={node.id}/>);
-  };
+  //мапим нужные поля и ключи к ним, эти ключи будем динамически подставлять для обновления node
+  const editingFields: { value: string | number; key: string }[] = [
+    { value: node.rowName, key: "rowName" },
+    { value: node.total, key: "total" },
+    { value: node.salary, key: "salary" },
+    { value: node.materials, key: "materials" },
+    { value: node.mainCosts, key: "mainCosts" },
+  ];
 
   return (
-    <React.Fragment key={node.id}>
+    <>
       <tr className={style.rowBorder}>
         <td style={{ paddingLeft: `${id * 20}px` }}>
           <div className={style.icons}>
             <input
               className={style.icon}
-              disabled={!!active || active === 0}
+              disabled={!!active}
+              style={{ zIndex: active ? -10 : 0 }}
               type="image"
-              id="file"
+              name="file"
               alt="fileIcon"
               src={FileIcon}
-              onClick={() => handleAddChild(node.id)}
+              onClick={() => myNode.handleAddChild()}
             />
             <input
               className={style.icon}
               disabled={!!active || active === 0}
               type="image"
-              id="trash"
+              name="trash"
               alt="trashIcon"
               src={TrashIcon}
-              onClick={() => handleDeleteChild(node.id)}
+              onClick={() => myNode.handleDeleteChild(node.id)}
             />
           </div>
         </td>
-        {[
-          node.rowName,
-          node.total,
-          node.salary,
-          node.materials,
-          node.mainCosts,
-        ].map((value, id) =>
-          <TableInputs value={value} active={active} key={id} setActive={setActive} nodeId={node.id} index={id}/>
-        )}
+        {editingFields.map((field, id) => (
+          // сюда мапятся выбранные инпуты
+          <TableInputs
+            key={id}
+            field={field}
+            active={active}
+            setActive={setActive}
+            node={node}
+          />
+        ))}
       </tr>
       {node.child && node.child.length > 0 && renderTree(node.child, id)}
-    </React.Fragment>
+    </>
   );
 };
 

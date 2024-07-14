@@ -2,6 +2,9 @@ import style from "./SideBar.module.sass";
 import arrow from "../../../../assets/arrow2.png";
 import SidebarList from "../../../../components/sidebarList/SidebarList";
 
+
+// просто sidebar
+
 const SideBar = () => {
   return (
     <div className={style.sidebar}>

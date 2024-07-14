@@ -1,20 +1,15 @@
 import React from "react";
 import style from "./TableHead.module.sass";
-import { fetchGetTreeRows } from "../../../../redux/slices/contentSlice";
-import { useCustomDispatch, useCustomSelector } from "../../../../hooks/store";
-import { selectContentData } from "../../../../redux/selectors";
 import TableList from "../TableList/TableList";
-
+import { IDataNode } from "../../../../types";
+import { useGetProjectsQuery } from "../../../../redux";
 
 const TableHead: React.FC = () => {
-  const dispatch = useCustomDispatch();
-  const treeData = useCustomSelector(selectContentData);
+  const { data = [], isLoading } = useGetProjectsQuery(undefined);
 
-  React.useEffect(() => {
-    dispatch(fetchGetTreeRows());
-  }, [dispatch]);
+  if (isLoading) return <h1>Loading...</h1>;
 
-  console.log(treeData);
+  // верхушка таблицы, здесь наименование столбцов, далее мапим саму таблицу
 
   return (
     <table>
@@ -29,11 +24,9 @@ const TableHead: React.FC = () => {
         </tr>
       </thead>
       <tbody>
-        {
-          treeData.data.map((node, id) => (
-            <TableList node={node} key={id} id={0}/>
-          ))
-        }
+        {data.map((node: IDataNode, id: number) => (
+          <TableList node={node} key={id} id={0} />
+        ))}
       </tbody>
     </table>
   );

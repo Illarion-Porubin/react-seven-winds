@@ -1,19 +1,10 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import contentReducer from './slices/contentSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import { projectsApi } from "./projectsApi";
 
-
-const rootReducer = combineReducers({
-  contentReducer,
-});
 
 export const store = configureStore({
-  reducer: rootReducer,
-  middleware: (getDefaultMiddleware) =>
-  getDefaultMiddleware({
-    serializableCheck: false
-  }),
+    reducer: {
+        [projectsApi.reducerPath]: projectsApi.reducer,
+    },
+    middleware: (getDefultMiddlware) => getDefultMiddlware().concat(projectsApi.middleware)
 })
-
-export type AppState = ReturnType<typeof store.getState>
-export type AppStore = typeof store;
-export type AppDispath = AppStore['dispatch']
