@@ -1,15 +1,17 @@
-import ItemList from "./components/itemList/ItemList";
 import SideBar from "./components/sideBar/SideBar";
-import TableHead from "./components/tableHead/TableHead";
+import TableTabs from "./components/tableTabs/TableTabs";
 import style from "./Table.module.sass";
+import TableHead from "./components/tableHead/TableHead";
 
 const Table = () => {
   return (
     <div className={style.table}>
       <SideBar />
       <div className={style.content}>
-        <TableHead />
-        <ItemList />
+        <TableTabs />
+        <div className={style.list}>
+          <TableHead />
+        </div>
       </div>
     </div>
   );

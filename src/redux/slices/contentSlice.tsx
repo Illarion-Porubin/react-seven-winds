@@ -1,78 +1,62 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IDataNode } from '../../types';
 import axios from 'axios';
 
 
-export const fetchGetContent = createAsyncThunk<any, undefined, { rejectValue: string }>(
-  "api/fetchGetContent", async (_, { rejectWithValue }) => {
-    const { data } = await axios.get("http://185.244.172.108:8081/v1/outlay-rows/entity/4/row/list");
-    console.log(data);
+
+export const fetchGetTreeRows = createAsyncThunk<IDataNode[], undefined, { rejectValue: string }>(
+  "api/data", async (_, { rejectWithValue }) => {
+    const { data } = await axios.get("http://185.244.172.108:8081/v1/outlay-rows/entity/133810/row/list");
     if (!data) {
       return rejectWithValue("Server Error!");
     }
     return data;
   });
 
+export const fetchCreateRowInEntity = createAsyncThunk<IDataNode[], {parentId: number, newChild: IDataNode}, { rejectValue: string }>(
+  "api/post", async (parameters, { rejectWithValue }) => {
+    const { data } = await axios.post(`http://185.244.172.108:8081/v1/outlay-rows/entity/133810/row/create`, parameters.newChild);
+    if (!data) {
+      return rejectWithValue("Server Error!");
+    }
+    return data.current.id;
+  });
 
-interface DataNode {
-  id: number;
-  rowName: string;
-  total: number;
-  salary: number;
-  materials: number;
-  mainCosts: number;
-  child?: DataNode[];
-  level: number; 
-}
+export const fetchUpdateRow = createAsyncThunk<IDataNode[], {parentId: number, newChild: IDataNode}, { rejectValue: string }>(
+  "api/post", async (params, { rejectWithValue }) => {
+    console.log(params, 'fetchUpdateRow');
+    const { data } = await axios.post(`http://185.244.172.108:8081/v1/outlay-rows/entity/133810/row/${params.parentId}/post`);
+    if (!data) {
+      return rejectWithValue("Server Error!");
+      }
+    return data;
+  });
+
+export const fetchDeleteRow = createAsyncThunk<IDataNode[], number, { rejectValue: string }>(
+  "api/delete", async (eID, { rejectWithValue }) => {
+    console.log(eID, 'fetchDeleteRow');
+    const { data } = await axios.delete(`http://185.244.172.108:8081/v1/outlay-rows/entity/133810/row/${eID}/delete`);
+    if (!data) {
+      return rejectWithValue("Server Error!");
+    }
+    return data;
+});
+
 
 export interface IContentState {
-  data: DataNode[];
+  data: IDataNode[];
   isLoading: 'idle' | 'loading' | 'loaded' | 'error';
   error: string | null;
 }
 
-const initialData: DataNode[] = [
-  {
-    id: 0,
-    rowName: 'string',
-    total: 1,
-    salary: 2033,
-    materials: 0,
-    mainCosts: 0,
-    level: 0, // Initialize level
-    child: [
-      {
-        id: 1,
-        rowName: 'string',
-        total: 1,
-        salary: 2033,
-        materials: 0,
-        mainCosts: 0,
-        level: 1, // Initialize level
-        child: [
-          {
-            id: 2,
-            rowName: 'string',
-            total: 0,
-            salary: 2033,
-            materials: 0,
-            mainCosts: 0,
-            level: 2, // Initialize level
-            child: [],
-          },
-        ],
-      },
-    ],
-  },
-];
-
 export interface IContentState {
-  data: any;
+  data: IDataNode[];
   isLoading: 'idle' | 'loading' | 'loaded' | 'error';
   error: string | null;
 }
 
 const initialState: IContentState = {
-  data: initialData,
+  data: [],
   isLoading: 'idle',
   error: null,
 };
@@ -81,11 +65,11 @@ const contentSlice = createSlice({
   name: 'content',
   initialState,
   reducers: {
-    addChild: (state, action: PayloadAction<{ parentId: number; newChild: DataNode }>) => {
-      const addNode = (nodes: DataNode[]): DataNode[] => {
+    addChild: (state, action: PayloadAction<{ parentId: number; newChild: IDataNode }>) => {
+      const addNode = (nodes: IDataNode[]): IDataNode[] => {
         return nodes.map(node => {
           if (node.id === action.payload.parentId) {
-            const newChild = { ...action.payload.newChild, level: node.level + 1 }; // Ensure correct level
+            const newChild = { ...action.payload.newChild, level: node.level + 1 }; // Remove
             return { ...node, child: [...(node.child || []), newChild] };
           } else if (node.child) {
             return { ...node, child: addNode(node.child) };
@@ -96,7 +80,7 @@ const contentSlice = createSlice({
       state.data = addNode(state.data);
     },
     deleteChild: (state, action: PayloadAction<number>) => {
-      const deleteNode = (nodes: DataNode[]): DataNode[] => {
+      const deleteNode = (nodes: IDataNode[]): IDataNode[] => {
         return nodes.filter(node => {
           if (node.id === action.payload) {
             return false;
@@ -109,7 +93,7 @@ const contentSlice = createSlice({
       state.data = deleteNode(state.data);
     },
     updateNodeValue: (state, action: PayloadAction<{ nodeId: number; index: number; value: string }>) => {
-      const updateNode = (nodes: DataNode[]): DataNode[] => {
+      const updateNode = (nodes: IDataNode[]): IDataNode[] => {
         return nodes.map(node => {
           if (node.id === action.payload.nodeId) {
             const values = [node.rowName, node.total.toString(), node.salary.toString(), node.materials.toString(), node.mainCosts.toString()];
@@ -126,16 +110,16 @@ const contentSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      ///fetchGetContent
-      .addCase(fetchGetContent.pending, (state) => {
+      ///fetchGetTreeRows
+      .addCase(fetchGetTreeRows.pending, (state) => {
         state.data = [];
         state.isLoading = "loading";
       })
-      .addCase(fetchGetContent.fulfilled, (state, action) => {
+      .addCase(fetchGetTreeRows.fulfilled, (state, action) => {
         state.data = action.payload;
         state.isLoading = "loaded";
       })
-      .addCase(fetchGetContent.rejected, (state) => {
+      .addCase(fetchGetTreeRows.rejected, (state) => {
         state.data = [];
         state.isLoading = "error";
       })
