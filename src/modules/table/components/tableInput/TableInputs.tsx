@@ -3,6 +3,8 @@ import style from "./TableInputs.module.sass";
 import { IDataNode, IUseNode } from "../../../../types";
 import { useNode } from "../../../../hooks/useNode";
 
+
+
 interface Props {
   field: { value: string | number; key: string };
   active: number | null;
@@ -25,11 +27,12 @@ const TableInputs: React.FC<Props> = ({ field, active, setActive, node }) => {
 
   // по двойному клику запускуаем редактирование инпутов
   const handleDoubleClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    console.log(node.id);
     e.currentTarget.removeAttribute("readonly");
     setActive(node.id);
   };
 
-  // обработчик value инпута, допускаем ввод только чисел или текста
+  // обработчик value инпута, допускаем ввод текста для rowName
   const handler = (e: React.ChangeEvent<HTMLInputElement>) => {
     return field.key !== "rowName"
       ? e.target.value.replace(/[^\d]/g, "")
@@ -37,7 +40,8 @@ const TableInputs: React.FC<Props> = ({ field, active, setActive, node }) => {
   };
 
   // вешаем стили на активный класс
-  const checkClass = active === node.id ? `${style.cell} ${style.active}` : `${style.cell}`
+  // при отсутствии каких либо данных отображайте строку в режиме редактирования
+  const checkClass = active === node.id || node.id === 0 ? `${style.cell} ${style.active}` : `${style.cell}`
 
   return (
     <>
@@ -50,7 +54,7 @@ const TableInputs: React.FC<Props> = ({ field, active, setActive, node }) => {
           readOnly={!node.id ? false : true}
           onBlur={onBlur}
           onDoubleClick={(e) => handleDoubleClick(e)}
-          onKeyDown={(e) => myNode.handleSaveChange(e)}
+          onKeyDown={(e) => myNode.handleSaveChange(e, node)}
           onChange={(e) => setInputValue(handler(e))}
         />
       </td>

@@ -1,21 +1,24 @@
 import React from "react";
 import style from "./TableHead.module.sass";
-import TableList from "../TableList/TableList";
+import TableList from "../tableList/TableList";
 import { IDataNode, IUseNode } from "../../../../types";
 import { useGetProjectsQuery } from "../../../../redux";
 import { useNode } from "../../../../hooks/useNode";
+
+
 
 // верхушка таблицы, здесь наименование столбцов, далее мапим саму таблицу
 
 const TableHead: React.FC = () => {
   const { data = [], isLoading } = useGetProjectsQuery(undefined);
   const { myNode }: IUseNode = useNode({});
+  
 
   if (isLoading) return <h1>Loading...</h1>;
 
-  // проверяем если массив пуст. 
-  // при отсутствии каких либо данных отображайте строку в режиме редактирования.
-  // готово)
+  // при отсутствии каких либо данных отображайте строку в режиме редактирования
+  // проверяем если массив пуст 
+  // готово
   const displayData = data.length > 0 ? data : [myNode.newNode];
 
   return (
@@ -34,6 +37,7 @@ const TableHead: React.FC = () => {
         {displayData.map((node: IDataNode, id: number) => (
           <TableList node={node} key={id} id={0} />
         ))}
+        
       </tbody>
     </table>
   );

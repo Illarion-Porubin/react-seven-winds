@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { useAddProjectMutation, useDeleteProjectMutation, useGetProjectsQuery, useUpdateProjectMutation } from '../redux';
 import { IDataNode } from '../types';
 
@@ -11,17 +12,19 @@ interface Props {
 
 //Здесь вся логика API ноды
 
-export const useNode = ({ node, inputName, inputValue, setActive }: Props) => {
+export const useNode = ({node, inputName, inputValue, setActive }: Props) => {
   const { data = [] } = useGetProjectsQuery(undefined);
+
+
   const [addProject] = useAddProjectMutation();
   const [deleteProject] = useDeleteProjectMutation();
   const [updateProject] = useUpdateProjectMutation();
 
 
   const newNode: IDataNode = {
-    id: node && (!!data.length) ? 0 : null,
+    id: node && (!!data.length) ? node.id : 0,
     parentId: node && (!!data.length) ? node.id : null,
-    rowName: "", // после сохранения этот объект отправится в пустой массив data
+    rowName: "", 
     total: 0,
     salary: 0,
     mimExploitation: 0,
@@ -36,7 +39,6 @@ export const useNode = ({ node, inputName, inputValue, setActive }: Props) => {
   };
 
   const handleAddChild = async () => {
-    console.log(newNode);
     await addProject({ ...newNode, id: 0 });
   };
 
@@ -44,14 +46,14 @@ export const useNode = ({ node, inputName, inputValue, setActive }: Props) => {
     deleteProject(nodeId);
   };
 
-  const handleSaveChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && node) {
+  const handleSaveChange = (e: React.KeyboardEvent<HTMLInputElement>, nodeTarget: IDataNode) => {
+    if (e.key === "Enter" && nodeTarget) {
       e.currentTarget.setAttribute("readonly", "true");
       const target = e.target as HTMLInputElement;
       if (target.type === "number") {
-        updateProject({ ...node, [`${inputName}`]: Number(inputValue) });
+        updateProject({ ...nodeTarget, [`${inputName}`]: Number(inputValue) });
       }
-      updateProject({ ...node, [`${inputName}`]: inputValue });
+      updateProject({ ...nodeTarget, [`${inputName}`]: inputValue });
       if(setActive){
         setActive(null);
       }
@@ -63,7 +65,7 @@ export const useNode = ({ node, inputName, inputValue, setActive }: Props) => {
       newNode,
       handleAddChild,
       handleDeleteChild,
-      handleSaveChange
+      handleSaveChange,
     }
   }
 }
