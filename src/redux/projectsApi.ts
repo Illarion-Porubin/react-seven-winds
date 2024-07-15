@@ -5,7 +5,6 @@ import { IDataNode } from "../types";
 export const projectsApi = createApi({
     reducerPath: 'projectsApi',
     tagTypes: ['Projects'],
-    /// уровни вложенности отображаются корректно, замените 133810 на 4
     baseQuery: fetchBaseQuery({ baseUrl: "http://185.244.172.108:8081/v1/outlay-rows/entity/133810/row/" }),
     endpoints: (build) => ({
         getProjects: build.query({

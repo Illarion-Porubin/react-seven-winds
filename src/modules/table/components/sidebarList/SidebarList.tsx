@@ -1,5 +1,5 @@
 import React from "react";
-import icon from "../../assets/projectIcon.png";
+import icon from "../../../../assets/icon.png";
 import style from "./SidebarList.module.sass"
 
 const SidebarList = () => {

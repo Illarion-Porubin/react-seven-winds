@@ -1,6 +1,6 @@
 import style from "./SideBar.module.sass";
 import arrow from "../../../../assets/arrow2.png";
-import SidebarList from "../../../../components/sidebarList/SidebarList";
+import SidebarList from "../sidebarList/SidebarList";
 
 
 // просто sidebar

@@ -15,6 +15,8 @@ const TableList: React.FC<Props> = ({ node, id }) => {
   const [active, setActive] = React.useState<number | null>(null);
   const {myNode}: IUseNode = useNode({node}); //вынес всю логику в отдельный хук
 
+
+
   const renderTree = (nodes: IDataNode[], id: number) => {
     return nodes.map((node) => (
       <TableList node={node} id={id + 1} key={node.id} />
@@ -24,7 +26,7 @@ const TableList: React.FC<Props> = ({ node, id }) => {
   //мапим нужные поля и ключи к ним, эти ключи будем динамически подставлять для обновления node
   const editingFields: { value: string | number; key: string }[] = [
     { value: node.rowName, key: "rowName" },
-    { value: node.total, key: "total" },
+    { value: node.mimExploitation, key: "mimExploitation" },
     { value: node.salary, key: "salary" },
     { value: node.materials, key: "materials" },
     { value: node.mainCosts, key: "mainCosts" },
@@ -52,7 +54,7 @@ const TableList: React.FC<Props> = ({ node, id }) => {
               name="trash"
               alt="trashIcon"
               src={TrashIcon}
-              onClick={() => myNode.handleDeleteChild(node.id)}
+              onClick={() => myNode.handleDeleteChild(Number(node.id))}
             />
           </div>
         </td>

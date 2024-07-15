@@ -1,5 +1,5 @@
 export interface IDataNode {
-  id: number;
+  id: number | null;
   parentId: number | null;
   rowName: string;
   total: number;
@@ -17,6 +17,7 @@ export interface IDataNode {
 
 export interface IUseNode {
   myNode: {
+    newNode: IDataNode;
     handleAddChild: () => Promise<void>;
     handleDeleteChild: (nodeId: number) => void;
     handleSaveChange: (e: React.KeyboardEvent<HTMLInputElement>) => void;

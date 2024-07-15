@@ -47,7 +47,7 @@ const TableInputs: React.FC<Props> = ({ field, active, setActive, node }) => {
           type={field.key !== "rowName" ? "number" : "text"}
           value={inputValue}
           name={field.key}
-          readOnly
+          readOnly={!node.id ? false : true}
           onBlur={onBlur}
           onDoubleClick={(e) => handleDoubleClick(e)}
           onKeyDown={(e) => myNode.handleSaveChange(e)}
