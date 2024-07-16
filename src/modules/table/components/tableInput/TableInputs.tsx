@@ -17,7 +17,7 @@ const TableInputs: React.FC<Props> = ({ field, active, setActive, node }) => {
   const [inputValue, setInputValue] = React.useState(field.value);
   const {myNode}: IUseNode = useNode({node, inputValue, inputName: field.key, setActive});
 
-  // убераем возможность редактирование инпута при клике на другой тег
+  // убираем возможность редактирование инпута при клике на другой тег
   const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     e.currentTarget.setAttribute("readonly", "true");
     // если сбрасываем поле и устанавливаем active = null

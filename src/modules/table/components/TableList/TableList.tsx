@@ -23,7 +23,6 @@ const TableList: React.FC<Props> = ({ node, id }) => {
     ));
   };
 
-  // почти 2 дня я пытался реализовать эти линии, но так и не получил нужный результат.
   // Ошибка Warning: validateDOMNesting(...): <div> cannot appear as a child of <tbody>, ругается не на div на 61стр, а на Xarrow 31стр
   const renderLine = (nodes: IDataNode[]) => {
     return nodes.map((child) => (
@@ -44,7 +43,7 @@ const TableList: React.FC<Props> = ({ node, id }) => {
     ));
   };
 
-  // Map needed fields and keys to them, these keys will be dynamically substituted to update the node
+  // эти ключи будут динамически заменяться для обновления узла
   const editingFields: { value: string | number; key: keyof IDataNode }[] = [
     { value: node.rowName, key: "rowName" },
     { value: node.mimExploitation, key: "mimExploitation" },
@@ -82,7 +81,6 @@ const TableList: React.FC<Props> = ({ node, id }) => {
           </div>
         </td>
         {editingFields.map((field, idx) => (
-          // Map selected inputs here
           <TableInputs
             key={idx}
             field={field}
